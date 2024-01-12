@@ -1,0 +1,4 @@
+Creating efficient and resource-conscious image-based hashtag recommendations with the help of ML.
+
+objective:
+The objective of this research paper is to develop a practical and efficient system for generating image-based hashtag recommendations using Deep Neural Networks (DNNs). This study aims to address the resource-intensive nature of existing hashtag recommendation approaches by leveraging DNNs to extract relevant features from images. By doing so, we intend to enhance the precision and scalability of hashtag suggestions. Our key objectives include designing a lightweight DNN architecture, optimizing resource usage, and evaluating the performance of the proposed system in terms of hashtag prediction accuracy. Through this research, we aspire to provide a valuable contribution to the field of social media analytics, making image-based hashtag recommendations more efficient and accessible.

@@ -1,0 +1,586 @@
+CSP
+
+#include <iostream>
+#include <vector>
+using namespace std;
+vector<int> use(10); // set 1, when one character is assigned previously
+struct node
+{
+    char letter;
+    int value;
+};
+int isValid(node *nodeList, const int nUnique, string s1, string s2, string s3)
+{
+    int val1 = 0, val2 = 0, val3 = 0, m = 1, j, i;
+    for (i = s1.length() - 1; i >= 0; i--)
+    { // find number for first string
+        char ch = s1[i];
+        for (j = 0; j < nUnique; j++)
+            if (nodeList[j].letter == ch) // when ch is present, break the loop
+                break;
+        val1 += m * nodeList[j].value;
+        m *= 10;
+    }
+    m = 1;
+    for (i = s2.length() - 1; i >= 0; i--)
+    { // find number for second string
+        char ch = s2[i];
+        for (j = 0; j < nUnique; j++)
+            if (nodeList[j].letter == ch)
+                break;
+        val2 += m * nodeList[j].value;
+        m *= 10;
+    }
+    m = 1;
+    for (i = s3.length() - 1; i >= 0; i--)
+    { // find number for third string
+        char ch = s3[i];
+        for (j = 0; j < nUnique; j++)
+            if (nodeList[j].letter == ch)
+                break;
+        val3 += m * nodeList[j].value;
+        m *= 10;
+    }
+    if (val3 == (val1 + val2)) // check whether the sum is same as 3rd string or not
+        return 1;
+    return 0;
+}
+bool permutation(int nUnique, node nodeList[], int cur, string s1, string s2, string s3)
+{
+    if (cur == nUnique - 1)
+    { // when values are assigned for all characters
+        for (int i = 0; i < 10; i++)
+        {
+            if (use[i] == 0)
+            {                            // for those numbers, which are not used
+                nodeList[cur].value = i; // assign value i
+                if (isValid(nodeList, nUnique, s1, s2, s3) == 1)
+                { // check validation
+                    cout << "Solution found: \n";
+                    for (int i = 0; i < s3.size() - s1.size(); i++)
+                        cout << " ";
+                    for (int i = 0; i < s1.size(); i++)
+                    {
+                        char c = s1[i];
+                        int j;
+                        for (j = 0; j < nUnique; j++)
+                        {
+                            if (nodeList[j].letter == c)
+                            {
+                                cout << nodeList[j].value;
+                                break;
+                            }
+                        }
+                    }
+                    cout << '\n';
+
+                    for (int i = 0; i < s3.size() - s2.size(); i++)
+                        cout << " ";
+                    for (int i = 0; i < s2.size(); i++)
+                    {
+                        char c = s2[i];
+                        int j;
+                        for (j = 0; j < nUnique; j++)
+                        {
+                            if (nodeList[j].letter == c)
+                            {
+                                cout << nodeList[j].value;
+                                break;
+                            }
+                        }
+                    }
+                    cout << '\n';
+                    for (int i = 0; i < s3.size(); i++)
+                    {
+                        char c = s3[i];
+                        int j;
+                        for (j = 0; j < nUnique; j++)
+                        {
+                            if (nodeList[j].letter == c)
+                            {
+                                cout << nodeList[j].value;
+                                break;
+                            }
+                        }
+                    }
+                    cout << '\n';
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (use[i] == 0)
+        {                            // for those numbers, which are not used
+            nodeList[cur].value = i; // assign value i and mark as not available for future use
+            use[i] = 1;
+            if (permutation(nUnique, nodeList, cur + 1, s1, s2, s3)) // go for next characters
+                return true;
+            use[i] = 0; // when backtracks, make available again
+        }
+    }
+    return false;
+}
+bool solvePuzzle(string s1, string s2, string s3)
+{
+    int uniqueChar = 0; // Number of unique characters
+    int len1 = s1.length();
+    int len2 = s2.length();
+    int len3 = s3.length();
+    vector<int> freq(26); // There are 26 different characters
+    for (int i = 0; i < len1; i++)
+        freq[s1[i] - 'A']++;
+
+    for (int i = 0; i < len2; i++)
+        freq[s2[i] - 'A']++;
+
+    for (int i = 0; i < len3; i++)
+        freq[s3[i] - 'A']++;
+
+    for (int i = 0; i < 26; i++)
+        if (freq[i] > 0) // whose frequency is > 0, they are present
+            uniqueChar++;
+
+    if (uniqueChar > 10)
+    { // as there are 10 digits in decimal system
+        cout << "Invalid strings";
+        return 0;
+    }
+    node nodeList[uniqueChar];
+    for (int i = 0, j = 0; i < 26; i++)
+    { // assign all characters found in three strings
+        if (freq[i] > 0)
+        {
+            nodeList[j].letter = char(i + 'A');
+            j++;
+        }
+    }
+
+    return permutation(uniqueChar, nodeList, 0, s1, s2, s3);
+}
+int main()
+{
+    string s1 = "BASE";
+    string s2 = "BALL";
+    string s3 = "GAMES";
+    if (solvePuzzle(s1, s2, s3) == false)
+        cout << "No solution";
+}
+
+
+
+
+
+
+SUDOKU
+_----------------------------------------------------------------------
+#include <iostream>
+#define N 9
+using namespace std;
+
+int grid[N][N] = {
+    {3, 0, 6, 5, 0, 8, 4, 0, 0},
+    {5, 2, 0, 0, 0, 0, 0, 0, 0},
+    {0, 8, 7, 0, 0, 0, 0, 3, 1},
+    {0, 0, 3, 0, 1, 0, 0, 8, 0},
+    {9, 0, 0, 8, 6, 3, 0, 0, 5},
+    {0, 5, 0, 0, 9, 0, 6, 0, 0},
+    {1, 3, 0, 0, 0, 0, 2, 5, 0},
+    {0, 0, 0, 0, 0, 0, 0, 7, 4},
+    {0, 0, 5, 2, 0, 6, 3, 0, 0},
+};
+bool isPresentInCol(int col, int num)
+{ // check whether num is present in col or not
+    for (int row = 0; row < N; row++)
+        if (grid[row][col] == num)
+            return true;
+    return false;
+}
+bool isPresentInRow(int row, int num)
+{ // check whether num is present in row or not
+    for (int col = 0; col < N; col++)
+        if (grid[row][col] == num)
+            return true;
+    return false;
+}
+bool isPresentInBox(int boxStartRow, int boxStartCol, int num)
+{
+    // check whether num is present in 3x3 box or not
+    for (int row = 0; row < 3; row++)
+        for (int col = 0; col < 3; col++)
+            if (grid[row + boxStartRow][col + boxStartCol] == num)
+                return true;
+    return false;
+}
+void sudokuGrid()
+{ // print the sudoku grid after solve
+    for (int row = 0; row < N; row++)
+    {
+        for (int col = 0; col < N; col++)
+        {
+            if (col == 3 || col == 6)
+                cout << " | ";
+            cout << grid[row][col] << " ";
+        }
+        if (row == 2 || row == 5)
+        {
+            cout << endl;
+            for (int i = 0; i < N; i++)
+                cout << "---";
+        }
+        cout << endl;
+    }
+}
+pair<int, int> findEmptyPlace()
+{ // get empty location and update row and column
+    int row, col;
+    for (row = 0; row < N; row++)
+        for (col = 0; col < N; col++)
+            if (grid[row][col] == 0) // marked with 0 is empty
+                return make_pair(row, col);
+
+    return make_pair(-1, -1);
+}
+bool isValidPlace(int row, int col, int num)
+{
+    // when item not found in col, row and current 3x3 box
+    return !isPresentInRow(row, num) && !isPresentInCol(col, num) && !isPresentInBox(row - row % 3, col - col % 3, num);
+}
+bool solveSudoku()
+{
+    int row, col;
+    pair<int, int> p = findEmptyPlace();
+    if (p.first == -1)
+        return true; // when all places are filled
+    row = p.first;
+    col = p.second;
+    for (int num = 1; num <= 9; num++)
+    { // valid numbers are 1 - 9
+        if (isValidPlace(row, col, num))
+        { // check validation, if yes, put the number in the grid
+            grid[row][col] = num;
+            if (solveSudoku()) // recursively go for other rooms in the grid
+                return true;
+            grid[row][col] = 0; // turn to unassigned space when conditions are not satisfied
+        }
+    }
+    return false;
+}
+
+bool isValidInput()
+{
+    for (int i = 0; i < N; i++)
+    {
+        bool v[10] = {0};
+        for (int j = 0; j < N; j++)
+        {
+            int val = grid[i][j];
+            if (v[val] && val != 0)
+            {
+                cout << "Invalid Sudoku. Multiple " << val << " in row " << i << endl;
+                return false;
+            }
+            else
+                v[val] = true;
+        }
+    }
+    for (int i = 0; i < N; i++)
+    {
+        bool v[10] = {0};
+        for (int j = 0; j < N; j++)
+        {
+            int val = grid[j][i];
+            if (v[val] && val != 0)
+            {
+                cout << "Invalid Sudoku. Multiple " << val << " in col " << i << endl;
+                return false;
+            }
+            else
+                v[val] = true;
+        }
+    }
+    cout << '\n';
+    return true;
+}
+
+int main()
+{
+    if (!isValidInput())
+        return 0;
+
+    if (solveSudoku() == true)
+        sudokuGrid();
+    else
+        cout << "No solution exists";
+}
+
+
+nQueen 
+....................................................................................
+import random
+
+N = int(input())
+
+def random_state():
+    state = []
+    for i in range(N):
+        state.append(random.randint(0, N-1))
+    return state
+    # return [random.randint(0, N-1) for _ in range(N)]
+
+def attacks(queen, row, col):
+    cnt=0
+    for i in range(col):
+      if queen[i] ==row or abs(queen[i]-row)==abs(i-col):
+        cnt+=1
+    return cnt
+    
+def total_attacks(state):
+    totalAttacks = 0
+    for col in range(N):
+        totalAttacks += attacks(state, state[col], col)
+    return totalAttacks
+
+def hill_climbing():
+    current_state = random_state()
+    attack_cnt = total_attacks(current_state)
+    
+    attempt_cnt=1
+    print("     Attempt : Total_attacks")
+    
+    while attack_cnt > 0:
+        next_state = current_state
+        col = random.randint(0, N-1)
+        row = random.randint(0, N-1)
+        next_state[col] = row
+
+        print("\t",attempt_cnt ," : ", attack_cnt)
+        # print_board(current_state)
+        new_attack_cnt = total_attacks(next_state)
+
+        if new_attack_cnt <= attack_cnt:
+            current_state, attack_cnt = next_state, new_attack_cnt
+        attempt_cnt+=1
+
+        
+    print("        ",attempt_cnt, " : ", attack_cnt)
+    return current_state
+
+def print_board(queen):
+  #print(state)
+  print("Queen Positions : ")
+  for i in range(len(queen)):
+        row = queen[i]
+        for col in range(N):
+            if row==col:
+                print(1,end=" ")
+            else:
+                print(0,end=" ")
+        print()
+     
+
+solution = hill_climbing()
+print_board(solution)
+
+
+Question Answer  
+......................................................................................
+data = {
+    ("sport", "play"): "play",
+    ("where", "hometown"): "hometown",
+    ("what", "favourite"): "favourite",
+    ("what", "department"): "department",
+    ("why", "sylhet"): "sylhet",
+    ("who", "goat"): "goat",
+    ("when", "match"): "match",
+}
+
+def has_both_keywords(input_text, keywords):
+    input_lower = input_text.lower()
+    for keyword in keywords:
+        if keyword not in input_lower:
+            return False
+    return True
+    
+
+    # return all(keyword in input_lower for keyword in keywords)
+
+def has_one_keyword(input_text, keywords):
+    input_lower = input_text.lower()
+    for keyword in keywords:
+        if keyword in input_lower:
+            return True
+    return False
+
+user_input = input("Ask a question: ")
+
+answer_keyword = []
+for keywords, response in data.items():
+    if has_both_keywords(user_input, keywords):
+        answer_keyword.append(response)
+        
+    elif has_one_keyword(user_input, keywords):
+        answer_keyword.append( response)
+
+if len(answer_keyword)==0 :
+    print("I couldn't find a relevant answer.")
+
+# print(answer_keyword)
+
+for keyword in answer_keyword:
+    with open("data.txt", "r") as file:
+        for line in file:
+            if keyword in line.lower():
+                print(line.strip())
+    
+    
+qa.txt
+I play different sports.
+I play ludu.
+My hometown is in tangail.
+Ludu is my favourite sports.
+CSE is my department.
+I live in sylhet.
+Messi is goat.
+Today is a big match.
+
+
+
+
+
+
+
+//...............................................................
+8-puzzle 8-puzzle 8-puzzle 8-puzzle 8-puzzle 8-puzzle 8-puzzle 8-puzzle 8-puzzle
+//........................
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct puzzle {
+    int blank;
+    vector < int > p;
+
+    puzzle () {
+        p = vector < int > (9, 0);
+    }
+};
+
+map < vector < int >, vector < int > > par;
+queue < puzzle > q;
+
+void add_to_q (const puzzle &u, const puzzle &p) {
+    if (par.count(u.p)) return;
+    par[u.p] = p.p;
+    q.push (u);
+}
+
+int step = 0;
+void print_result (const vector < int > &p) {
+    if (p != par[p])
+        print_result(par[p]);
+
+    cout << "Step " << step++ << ":\n";
+    for (int i = 0; i < 9; i++) {
+        cout << p[i] << " \n"[i % 3 == 2];
+    }
+    cout << "\n\n";
+}
+
+bool solvability(const puzzle p)
+{
+    int bugi=0;
+    int done[9] = {0};
+    for(int i=0;i<9;i++){
+        for(int j=p.p[i]-1;j>=0;j--){
+            if(!done[j])bugi++;
+        }
+        done[p.p[i] - 1]++;
+    }
+    if(bugi%2){
+        cout << "Unsolvable!!!" << endl;
+        return false;
+    }
+    else {
+        cout << "Solvable !" << endl;
+        return true;
+    }
+}
+
+
+int main() {
+    here1:
+    cout << "Enter the 8-Puzzle:\n";
+    puzzle p;
+    for (int i = 0; i < 9; i++) {
+        cin >> p.p[i];
+        if (!p.p[i]) p.blank = i;
+    }
+    par[p.p] = p.p;
+    q.push (p);
+
+    puzzle res;
+    for (int i = 0; i < 8; i++) 
+        res.p[i] = i + 1;
+    res.blank = 8;
+    
+    //.........................
+    if(!solvability(p))return 0;
+    //.........................
+
+    while (q.size ()) {
+        puzzle p = q.front ();
+        q.pop ();
+        if (p.p == res.p) break;
+
+        if (p.blank % 3 >= 1) {
+            puzzle p1;
+
+            p1.blank = p.blank - 1;
+            p1.p = p.p;
+            swap (p1.p[p.blank], p1.p[p1.blank]);
+
+            add_to_q(p1, p);
+        }
+
+        if (p.blank % 3 <= 1) {
+            puzzle p1;
+
+            p1.blank = p.blank + 1;
+            p1.p = p.p;
+            swap (p1.p[p.blank], p1.p[p1.blank]);
+
+            add_to_q(p1, p);
+        }
+
+        if (p.blank / 3 >= 1) {
+            puzzle p1;
+
+            p1.blank = p.blank - 3;
+            p1.p = p.p;
+            swap (p1.p[p.blank], p1.p[p1.blank]);
+
+            add_to_q(p1, p);
+        }
+
+        if (p.blank / 3 <= 1) {
+            puzzle p1;
+
+            p1.blank = p.blank + 3;
+            p1.p = p.p;
+            swap (p1.p[p.blank], p1.p[p1.blank]);
+
+            add_to_q(p1, p);
+        }
+
+    }
+
+    cout << "Here are the steps:\n";
+
+    print_result(res.p);
+
+}
+
